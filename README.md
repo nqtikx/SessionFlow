@@ -56,7 +56,7 @@ Use the response `sessionId` and `sdk.url` to start the client flow and track it
 ```json
 {
   "fromAsset": "BYN",
-  "fromAmount": "100",
+  "fromAmount": 100,
   "toAsset": "USDT_TRC",
   "destinationCryptoAddress": "TCT2pKJXo233hrKWQMeCptC8My1KGvtsU4",
   "externalClientId": "externalClientId"
@@ -197,7 +197,6 @@ Use the response to validate amount input before creating session/order.
 | Name | Type | Description |
 | --- | --- | --- |
 | `asset` | `object` | Asset for which limit values are returned. |
-| `asset.id` | `string` | Internal asset identifier. |
 | `asset.code` | `string` | Asset code. |
 | `min` | `number` | Minimum allowed amount. |
 | `max` | `number` | Maximum allowed amount. |
@@ -256,8 +255,9 @@ Use the response to restore session/order state in SDK integration.
 
 | Name | Type | Required | Description |
 | --- | --- | --- | --- |
-| `externalClientId` | `string` | Conditionally | Required when `clientId` is not provided. |
-| `clientId` | `string` | Conditionally | Required when `externalClientId` is not provided. |
+| `clientId` | `string` | Conditionally | Required when `externalClientId` query param is not provided. |
+| `externalClientId` | `string` | Conditionally | Required when `clientId` query param is not provided. |
+| `destination` | `string` | No | Destination filter, default value is `EXCHANGE`. |
 
 ### Response
 
@@ -266,20 +266,74 @@ Use the response to restore session/order state in SDK integration.
 | `id` | `string` | Order id. |
 | `number` | `number` | Human-readable order number. |
 | `conditions` | `object` | Rate block used in order. |
+| `conditions.fromAsset` | `string` | Source asset id. |
+| `conditions.toAsset` | `string` | Target asset id. |
+| `conditions.fromGrossAmount` | `number` | Source amount before source-side fee. |
+| `conditions.fromNetAmount` | `number` | Source amount after source-side fee. |
+| `conditions.fromFeeAmount` | `number` | Source-side fee amount. |
+| `conditions.toGrossAmount` | `number` | Target amount before target-side fee. |
+| `conditions.toNetAmount` | `number` | Target amount after target-side fee. |
+| `conditions.toFeeAmount` | `number` | Target-side fee amount. |
+| `conditions.promoCode` | `string \| null` | Promo code used in order conditions. |
 | `conditions.rate` | `string` | Rate pair code. |
 | `conditions.systemRateValue` | `number` | System/base rate value. |
 | `conditions.exchangeRateValue` | `number` | Exchange rate value. |
 | `conditions.actualRateValue` | `number` | Actual final rate value. |
+| `recalculationReason` | `string \| null` | Recalculation reason enum value, if order was recalculated. |
+| `clientId` | `string` | Internal client id. |
 | `sessionId` | `string` | Session id linked to this order. |
 | `status` | `string` | Current order status. |
+| `failureMessage` | `string \| null` | Technical/business failure reason for failed flow. |
+| `completionDate` | `string \| null` | Completion timestamp. |
+| `creationDate` | `string` | Creation timestamp. |
 | `input` | `object` | Input operation details. |
 | `input.type` | `string` | Input operation type. |
 | `input.asset` | `string` | Input asset code. |
 | `input.amount` | `number` | Input amount. |
+| `input.transactionAmount` | `number \| null` | Provider/blockchain transaction amount. |
+| `input.feeAmount` | `number \| null` | Input-side operation fee amount. |
+| `input.status` | `string \| null` | Operation status. |
+| `input.failureMessage` | `string \| null` | Operation failure details. |
+| `input.expirationDate` | `string \| null` | Operation expiration timestamp. |
+| `input.provider` | `string \| null` | Fiat-provider specific field (`FIAT_PROVIDER`). |
+| `input.paymentType` | `string \| null` | Fiat-provider payment type. |
+| `input.processingBank` | `string \| null` | Provider processing bank name. |
+| `input.clientBank` | `string \| null` | Client bank name. |
+| `input.fromToken` | `string \| null` | Source payment token id. |
+| `input.toToken` | `string \| null` | Destination payment token id. |
+| `input.link` | `string \| null` | Provider payment/deeplink URL. |
+| `input.processorTransactionId` | `string \| null` | Provider transaction id. |
+| `input.post` | `string \| null` | Masked card/post value from token metadata. |
+| `input.paymentSystem` | `string \| null` | Payment system brand. |
+| `input.processorTransactionNumber` | `string \| null` | Provider transaction display number. |
+| `input.fromAddress` | `string \| null` | Source crypto address (`CRYPTO_TRANSFER`). |
+| `input.toAddress` | `string \| null` | Destination crypto address (`CRYPTO_TRANSFER`). |
+| `input.comment` | `string \| null` | Crypto transfer comment/tag. |
+| `input.hash` | `string \| null` | Blockchain transaction hash. |
 | `output` | `object` | Output operation details. |
 | `output.type` | `string` | Output operation type. |
 | `output.asset` | `string` | Output asset code. |
 | `output.amount` | `number` | Output amount. |
+| `output.transactionAmount` | `number \| null` | Provider/blockchain transaction amount. |
+| `output.feeAmount` | `number \| null` | Output-side operation fee amount. |
+| `output.status` | `string \| null` | Operation status. |
+| `output.failureMessage` | `string \| null` | Operation failure details. |
+| `output.expirationDate` | `string \| null` | Operation expiration timestamp. |
+| `output.provider` | `string \| null` | Fiat-provider specific field (`FIAT_PROVIDER`). |
+| `output.paymentType` | `string \| null` | Fiat-provider payment type. |
+| `output.processingBank` | `string \| null` | Provider processing bank name. |
+| `output.clientBank` | `string \| null` | Client bank name. |
+| `output.fromToken` | `string \| null` | Source payment token id. |
+| `output.toToken` | `string \| null` | Destination payment token id. |
+| `output.link` | `string \| null` | Provider payment/deeplink URL. |
+| `output.processorTransactionId` | `string \| null` | Provider transaction id. |
+| `output.post` | `string \| null` | Masked card/post value from token metadata. |
+| `output.paymentSystem` | `string \| null` | Payment system brand. |
+| `output.processorTransactionNumber` | `string \| null` | Provider transaction display number. |
+| `output.fromAddress` | `string \| null` | Source crypto address (`CRYPTO_TRANSFER`). |
+| `output.toAddress` | `string \| null` | Destination crypto address (`CRYPTO_TRANSFER`). |
+| `output.comment` | `string \| null` | Crypto transfer comment/tag. |
+| `output.hash` | `string \| null` | Blockchain transaction hash. |
 
 ### Errors
 
@@ -335,11 +389,48 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 | Name | Type | Required | Description |
 | --- | --- | --- | --- |
 | `externalClientId` | `string` | No | External client id filter. |
-| `sessionIds` | `array of string` | No | Filter by session ids. |
-| `clientIds` | `array of string` | Conditionally | Alternative client filter. |
+| `sessionIds` | `array of string` | No | Filter by session ids (`UUID`). |
+| `clientIds` | `array of string` | Conditionally | Used to resolve merchant client when `externalClientId` is not provided (first value is used). |
 | `clientId` | `string` | Conditionally | Alternative client filter. |
 | `statuses` | `array of string` | No | Order status filter list. |
 | `creationDateFrame` | `object` | No | Creation date range filter object. |
+| `numbers` | `array of number` | No | Filter by order numbers. |
+| `orderIds` | `array of string` | No | Filter by order ids (`UUID`). |
+| `inputAssets` | `array of string` | No | Filter by input asset ids. |
+| `outputAssets` | `array of string` | No | Filter by output asset ids. |
+| `assets` | `array of string` | No | Filter by any operation asset ids. |
+| `inputOperationTypes` | `array of string` | No | Filter by input operation type enum values. |
+| `outputOperationTypes` | `array of string` | No | Filter by output operation type enum values. |
+| `operationTypes` | `array of string` | No | Filter by any operation type enum values. |
+| `recalculationReasons` | `array of string` | No | Filter by recalculation reason enum values. |
+| `completionDateFrame` | `object` | No | Completion date range filter object. |
+| `fiatTransactionProviders` | `array of string` | No | Filter by fiat provider ids. |
+| `cryptoTransactionAddresses` | `array of string` | No | Filter by crypto addresses. |
+| `cryptoTransactionHashes` | `array of string` | No | Filter by transaction hashes. |
+| `merchantIds` | `array of string` | No | Filter by merchant ids (merchant-admin context). |
+| `inputOperationStatuses` | `array of object` | No | Input operation status filters. |
+| `inputOperationStatuses[].status` | `string` | No | Input operation status enum. |
+| `inputOperationStatuses[].processingStatus` | `string` | No | Provider/internal processing status. |
+| `outputOperationStatuses` | `array of object` | No | Output operation status filters. |
+| `outputOperationStatuses[].status` | `string` | No | Output operation status enum. |
+| `outputOperationStatuses[].processingStatus` | `string` | No | Provider/internal processing status. |
+| `operationStatuses` | `array of object` | No | Generic operation status filters. |
+| `operationStatuses[].status` | `string` | No | Operation status enum. |
+| `operationStatuses[].processingStatus` | `string` | No | Provider/internal processing status. |
+| `inputTransactionStatuses` | `array of string` | No | Input transaction status enum values. |
+| `outputTransactionStatuses` | `array of string` | No | Output transaction status enum values. |
+| `transactionStatuses` | `array of string` | No | Generic transaction status enum values. |
+| `operationAccountTypes` | `array of string` | No | Account type enum values. |
+| `replicated` | `boolean` | No | Replication flag filter. |
+| `fiatProcessorTransactionIds` | `array of string` | No | Filter by fiat processor transaction ids. |
+| `arrested` | `boolean` | No | Arrested order flag filter. |
+| `inputAmount` | `object` | No | Input amount range filter. |
+| `inputAmount.from` | `number` | No | Input amount lower bound. |
+| `inputAmount.to` | `number` | No | Input amount upper bound. |
+| `outputAmount` | `object` | No | Output amount range filter. |
+| `outputAmount.from` | `number` | No | Output amount lower bound. |
+| `outputAmount.to` | `number` | No | Output amount upper bound. |
+| `destinations` | `array of string` | No | Destination enum values. |
 
 ### Response
 
@@ -348,8 +439,16 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 | `content` | `array of objects` | Page content list. |
 | `content[].id` | `string` | Order id. |
 | `content[].number` | `number` | Order number. |
+| `content[].conditions` | `object` | Conditions block (same structure as Step 3 response). |
+| `content[].recalculationReason` | `string \| null` | Recalculation reason enum value. |
+| `content[].input` | `object` | Input operation block (same structure as Step 3 response). |
+| `content[].output` | `object` | Output operation block (same structure as Step 3 response). |
+| `content[].clientId` | `string` | Internal client id. |
 | `content[].sessionId` | `string` | Related session id. |
 | `content[].status` | `string` | Order status value. |
+| `content[].failureMessage` | `string \| null` | Failure details, if any. |
+| `content[].completionDate` | `string \| null` | Completion timestamp. |
+| `content[].creationDate` | `string` | Creation timestamp. |
 | `totalElements` | `number` | Total matched records. |
 | `totalPages` | `number` | Total pages count. |
 | `number` | `number` | Current page number. |
