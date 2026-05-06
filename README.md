@@ -172,7 +172,7 @@ Use the response to validate amount input before creating session/order.
 **Response**
 ```json
 {
-  "asset": { "id": "RUB", "code": "RUB" },
+  "asset": { "code": "RUB" },
   "min": 947.37,
   "max": 3735526.32
 }
@@ -198,6 +198,8 @@ Use the response to validate amount input before creating session/order.
 | --- | --- | --- |
 | `asset` | `object` | Asset for which limit values are returned. |
 | `asset.code` | `string` | Asset code. |
+| `asset.network` | `string \| null` | Asset network, if present. |
+| `asset.protocol` | `string \| null` | Asset protocol, if present. |
 | `min` | `number` | Minimum allowed amount. |
 | `max` | `number` | Maximum allowed amount. |
 
@@ -219,29 +221,67 @@ Use the response to restore session/order state in SDK integration.
 **Headers**
 `x-api-key: {{x-api-key}}`
 
+**Parameters**
+`clientId: {{clientId}}`
+
 **Response**
 ```json
 {
-  "id": "5289b6f0-4945-4b74-b243-4fad013eed50",
-  "number": 9210086,
-  "conditions": {
-    "rate": "TRX/BYN",
-    "systemRateValue": 1.2,
-    "exchangeRateValue": 1.2,
-    "actualRateValue": 1.24409
-  },
-  "sessionId": "14500600-0631-46c4-9ae1-fab9e4c798f8",
-  "status": "COMPLETED",
-  "input": {
-    "type": "FIAT_PROVIDER",
-    "asset": "BYN",
-    "amount": 50
-  },
-  "output": {
-    "type": "CRYPTO_TRANSFER",
-    "asset": "TRX",
-    "amount": 40.190074
-  }
+    "id": "7f0ec09a-2ea7-410b-bc5c-09e94ec2ccb1",
+    "number": 911000004333,
+    "conditions": {
+        "fromAsset": "BYN",
+        "toAsset": "TRX",
+        "fromGrossAmount": "50",
+        "fromNetAmount": "46.65",
+        "fromFeeAmount": "3.35",
+        "toGrossAmount": "44.838524",
+        "toNetAmount": "44.838524",
+        "toFeeAmount": "0",
+        "promoCode": null,
+        "rate": "TRX/BYN",
+        "systemRateValue": "1.0404",
+        "exchangeRateValue": "1.0404",
+        "actualRateValue": "1.1151"
+    },
+    "recalculationReason": null,
+    "clientId": "3e1469fa-8d35-441c-87b1-a007aeba2562",
+    "status": "PROCESSING",
+    "failureMessage": null,
+    "completionDate": null,
+    "creationDate": "2026-05-06T17:12:11+0000",
+    "sessionId": null,
+    "input": {
+        "type": "FIAT_PROVIDER",
+        "asset": "BYN",
+        "amount": "50",
+        "transactionAmount": "50",
+        "feeAmount": "3.35",
+        "status": "PROCESSING",
+        "failureMessage": null,
+        "expirationDate": null,
+        "provider": "ASSIST",
+        "paymentType": "P2P",
+        "processingBank": "BELARUSBANK",
+        "clientBank": null,
+        "fromToken": "fc4b130e-c3bf-4a3d-abe5-9ec5900c9868",
+        "toToken": "50d53e2e-f086-472a-9ce2-cdcee43279cb",
+        "link": "https://payments.t.paysecure.ru/pay/p2p/cc2mc.cfm...",
+        "processorTransactionId": "36b7f4d1d15849deb1002e471fdd219a",
+        "post": null,
+        "paymentSystem": null,
+        "processorTransactionNumber": null
+    },
+    "output": {
+        "type": "INTERNAL_BALANCE",
+        "asset": "TRX",
+        "amount": "44.838524",
+        "transactionAmount": "44.838524",
+        "feeAmount": "0",
+        "status": "NEW",
+        "failureMessage": null,
+        "expirationDate": null
+    }
 }
 ```
 
@@ -281,7 +321,7 @@ Use the response to restore session/order state in SDK integration.
 | `conditions.actualRateValue` | `number` | Actual final rate value. |
 | `recalculationReason` | `string \| null` | Recalculation reason enum value, if order was recalculated. |
 | `clientId` | `string` | Internal client id. |
-| `sessionId` | `string` | Session id linked to this order. |
+| `sessionId` | `string \| null` | Session id linked to this order. |
 | `status` | `string` | Current order status. |
 | `failureMessage` | `string \| null` | Technical/business failure reason for failed flow. |
 | `completionDate` | `string \| null` | Completion timestamp. |
@@ -354,9 +394,7 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 **Request**
 ```json
 {
-  "externalClientId": "external-client-id-1",
-  "sessionIds": ["14500600-0631-46c4-9ae1-fab9e4c798f8"],
-  "statuses": ["COMPLETED"]
+    "clientIds": ["{{clientId}}"]
 }
 ```
 
@@ -364,17 +402,89 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 ```json
 {
   "content": [
-    {
-      "id": "5289b6f0-4945-4b74-b243-4fad013eed50",
-      "number": 9210086,
-      "sessionId": "14500600-0631-46c4-9ae1-fab9e4c798f8",
-      "status": "COMPLETED"
-    }
+        {
+            "id": "7f0ec09a-2ea7-410b-bc5c-09e94ec2ccb1",
+            "number": 911000004333,
+            "conditions": {
+                "fromAsset": "BYN",
+                "toAsset": "TRX",
+                "fromGrossAmount": "50",
+                "fromNetAmount": "46.65",
+                "fromFeeAmount": "3.35",
+                "toGrossAmount": "44.838524",
+                "toNetAmount": "44.838524",
+                "toFeeAmount": "0",
+                "promoCode": null,
+                "rate": "TRX/BYN",
+                "systemRateValue": "1.0404",
+                "exchangeRateValue": "1.0404",
+                "actualRateValue": "1.1151"
+            },
+            "recalculationReason": "NONE",
+            "clientId": "3e1469fa-8d35-441c-87b1-a007aeba2562",
+            "status": "COMPLETED",
+            "failureMessage": null,
+            "completionDate": "2026-05-06T17:13:36+0000",
+            "creationDate": "2026-05-06T17:12:11+0000",
+            "sessionId": null,
+            "input": {
+                "type": "FIAT_PROVIDER",
+                "asset": "BYN",
+                "amount": "50",
+                "transactionAmount": "50",
+                "feeAmount": "3.35",
+                "status": "COMPLETED",
+                "failureMessage": null,
+                "expirationDate": null,
+                "provider": "ASSIST",
+                "paymentType": "P2P",
+                "processingBank": "BELARUSBANK",
+                "clientBank": null,
+                "fromToken": "fc4b130e-c3bf-4a3d-abe5-9ec5900c9868",
+                "toToken": "50d53e2e-f086-472a-9ce2-cdcee43279cb",
+                "link": "https://payments.t.paysecure.ru/pay/p2p/cc2mc.cfm...",
+                "processorTransactionId": "36b7f4d1d15849deb1002e471fdd219a",
+                "post": null,
+                "paymentSystem": null,
+                "processorTransactionNumber": null
+            },
+            "output": {
+                "type": "INTERNAL_BALANCE",
+                "asset": "TRX",
+                "amount": "44.838524",
+                "transactionAmount": "44.838524",
+                "feeAmount": "0",
+                "status": "COMPLETED",
+                "failureMessage": null,
+                "expirationDate": null
+            }
+        },
   ],
-  "totalElements": 1,
-  "totalPages": 1,
-  "number": 0,
-  "size": 10
+  "pageable": {
+        "sort": {
+            "unsorted": false,
+            "sorted": true,
+            "empty": false
+        },
+        "pageNumber": 0,
+        "pageSize": 10,
+        "offset": 0,
+        "paged": true,
+        "unpaged": false
+    },
+    "totalElements": 50,
+    "totalPages": 5,
+    "last": false,
+    "numberOfElements": 10,
+    "size": 10,
+    "number": 0,
+    "sort": {
+        "unsorted": false,
+        "sorted": true,
+        "empty": false
+    },
+    "first": true,
+    "empty": false
 }
 ```
 
@@ -390,8 +500,8 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 | --- | --- | --- | --- |
 | `externalClientId` | `string` | No | External client id filter. |
 | `sessionIds` | `array of string` | No | Filter by session ids (`UUID`). |
-| `clientIds` | `array of string` | Conditionally | Used to resolve merchant client when `externalClientId` is not provided (first value is used). |
-| `clientId` | `string` | Conditionally | Alternative client filter. |
+| `clientIds` | `array of string` | Conditionally | Required when `externalClientId` is not provided (first value is used for merchant access validation). |
+| `clientId` | `string` | No | Deprecated single-value client filter field from DTO. |
 | `statuses` | `array of string` | No | Order status filter list. |
 | `creationDateFrame` | `object` | No | Creation date range filter object. |
 | `numbers` | `array of number` | No | Filter by order numbers. |
@@ -439,20 +549,97 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 | `content` | `array of objects` | Page content list. |
 | `content[].id` | `string` | Order id. |
 | `content[].number` | `number` | Order number. |
-| `content[].conditions` | `object` | Conditions block (same structure as Step 3 response). |
+| `content[].conditions` | `object` | Conditions block. |
+| `content[].conditions.fromAsset` | `string` | Source asset id. |
+| `content[].conditions.toAsset` | `string` | Target asset id. |
+| `content[].conditions.fromGrossAmount` | `number` | Source amount before source-side fee. |
+| `content[].conditions.fromNetAmount` | `number` | Source amount after source-side fee. |
+| `content[].conditions.fromFeeAmount` | `number` | Source-side fee amount. |
+| `content[].conditions.toGrossAmount` | `number` | Target amount before target-side fee. |
+| `content[].conditions.toNetAmount` | `number` | Target amount after target-side fee. |
+| `content[].conditions.toFeeAmount` | `number` | Target-side fee amount. |
+| `content[].conditions.promoCode` | `string \| null` | Promo code used in order conditions. |
+| `content[].conditions.rate` | `string` | Rate pair code. |
+| `content[].conditions.systemRateValue` | `number` | System/base rate value. |
+| `content[].conditions.exchangeRateValue` | `number` | Exchange rate value. |
+| `content[].conditions.actualRateValue` | `number` | Actual final rate value. |
 | `content[].recalculationReason` | `string \| null` | Recalculation reason enum value. |
-| `content[].input` | `object` | Input operation block (same structure as Step 3 response). |
-| `content[].output` | `object` | Output operation block (same structure as Step 3 response). |
+| `content[].input` | `object` | Input operation block. |
+| `content[].input.type` | `string` | Input operation type. |
+| `content[].input.asset` | `string` | Input asset code. |
+| `content[].input.amount` | `number` | Input amount. |
+| `content[].input.transactionAmount` | `number \| null` | Provider/blockchain transaction amount. |
+| `content[].input.feeAmount` | `number \| null` | Input-side operation fee amount. |
+| `content[].input.status` | `string \| null` | Operation status. |
+| `content[].input.failureMessage` | `string \| null` | Operation failure details. |
+| `content[].input.expirationDate` | `string \| null` | Operation expiration timestamp. |
+| `content[].input.provider` | `string \| null` | Fiat-provider specific field (`FIAT_PROVIDER`). |
+| `content[].input.paymentType` | `string \| null` | Fiat-provider payment type. |
+| `content[].input.processingBank` | `string \| null` | Provider processing bank name. |
+| `content[].input.clientBank` | `string \| null` | Client bank name. |
+| `content[].input.fromToken` | `string \| null` | Source payment token id. |
+| `content[].input.toToken` | `string \| null` | Destination payment token id. |
+| `content[].input.link` | `string \| null` | Provider payment/deeplink URL. |
+| `content[].input.processorTransactionId` | `string \| null` | Provider transaction id. |
+| `content[].input.post` | `string \| null` | Masked card/post value from token metadata. |
+| `content[].input.paymentSystem` | `string \| null` | Payment system brand. |
+| `content[].input.processorTransactionNumber` | `string \| null` | Provider transaction display number. |
+| `content[].input.fromAddress` | `string \| null` | Source crypto address (`CRYPTO_TRANSFER`). |
+| `content[].input.toAddress` | `string \| null` | Destination crypto address (`CRYPTO_TRANSFER`). |
+| `content[].input.comment` | `string \| null` | Crypto transfer comment/tag. |
+| `content[].input.hash` | `string \| null` | Blockchain transaction hash. |
+| `content[].output` | `object` | Output operation block. |
+| `content[].output.type` | `string` | Output operation type. |
+| `content[].output.asset` | `string` | Output asset code. |
+| `content[].output.amount` | `number` | Output amount. |
+| `content[].output.transactionAmount` | `number \| null` | Provider/blockchain transaction amount. |
+| `content[].output.feeAmount` | `number \| null` | Output-side operation fee amount. |
+| `content[].output.status` | `string \| null` | Operation status. |
+| `content[].output.failureMessage` | `string \| null` | Operation failure details. |
+| `content[].output.expirationDate` | `string \| null` | Operation expiration timestamp. |
+| `content[].output.provider` | `string \| null` | Fiat-provider specific field (`FIAT_PROVIDER`). |
+| `content[].output.paymentType` | `string \| null` | Fiat-provider payment type. |
+| `content[].output.processingBank` | `string \| null` | Provider processing bank name. |
+| `content[].output.clientBank` | `string \| null` | Client bank name. |
+| `content[].output.fromToken` | `string \| null` | Source payment token id. |
+| `content[].output.toToken` | `string \| null` | Destination payment token id. |
+| `content[].output.link` | `string \| null` | Provider payment/deeplink URL. |
+| `content[].output.processorTransactionId` | `string \| null` | Provider transaction id. |
+| `content[].output.post` | `string \| null` | Masked card/post value from token metadata. |
+| `content[].output.paymentSystem` | `string \| null` | Payment system brand. |
+| `content[].output.processorTransactionNumber` | `string \| null` | Provider transaction display number. |
+| `content[].output.fromAddress` | `string \| null` | Source crypto address (`CRYPTO_TRANSFER`). |
+| `content[].output.toAddress` | `string \| null` | Destination crypto address (`CRYPTO_TRANSFER`). |
+| `content[].output.comment` | `string \| null` | Crypto transfer comment/tag. |
+| `content[].output.hash` | `string \| null` | Blockchain transaction hash. |
 | `content[].clientId` | `string` | Internal client id. |
-| `content[].sessionId` | `string` | Related session id. |
+| `content[].sessionId` | `string \| null` | Related session id. |
 | `content[].status` | `string` | Order status value. |
 | `content[].failureMessage` | `string \| null` | Failure details, if any. |
 | `content[].completionDate` | `string \| null` | Completion timestamp. |
 | `content[].creationDate` | `string` | Creation timestamp. |
+| `pageable` | `object` | Paging metadata block. |
+| `pageable.sort` | `object` | Sort metadata for current page request. |
+| `pageable.sort.unsorted` | `boolean` | Whether paging sort is unsorted. |
+| `pageable.sort.sorted` | `boolean` | Whether paging sort is applied. |
+| `pageable.sort.empty` | `boolean` | Whether sort metadata is empty. |
+| `pageable.pageNumber` | `number` | Current page number. |
+| `pageable.pageSize` | `number` | Current page size. |
+| `pageable.offset` | `number` | Current page offset. |
+| `pageable.paged` | `boolean` | Indicates paged request mode. |
+| `pageable.unpaged` | `boolean` | Indicates unpaged request mode. |
 | `totalElements` | `number` | Total matched records. |
 | `totalPages` | `number` | Total pages count. |
+| `last` | `boolean` | Whether current page is the last page. |
+| `numberOfElements` | `number` | Number of elements in current page. |
 | `number` | `number` | Current page number. |
 | `size` | `number` | Page size. |
+| `sort` | `object` | Sort metadata for response page. |
+| `sort.unsorted` | `boolean` | Whether page content is unsorted. |
+| `sort.sorted` | `boolean` | Whether page content is sorted. |
+| `sort.empty` | `boolean` | Whether sort metadata is empty. |
+| `first` | `boolean` | Whether current page is the first page. |
+| `empty` | `boolean` | Whether page content is empty. |
 
 ### Errors
 
@@ -475,9 +662,7 @@ Use the response to select provider and render allowed direction/currency combin
 **Request**
 ```json
 {
-  "fiatAsset": "RUB",
-  "orderType": "BUY",
-  "destination": "CARD"
+    "clientId": "{{clientId}}"
 }
 ```
 
@@ -485,35 +670,60 @@ Use the response to select provider and render allowed direction/currency combin
 ```json
 [
   {
-    "id": "MTS",
-    "name": "MTS",
-    "addPaymentMethod": true,
-    "config": {
-      "paymentSystems": [
-        {
-          "paymentSystem": "MIR",
-          "type": "PSP",
-          "directions": [
-            {
-              "direction": "SELL",
-              "currencies": [
+        "id": "MTS",
+        "name": "MTS",
+        "addPaymentMethod": true,
+        "config": {
+            "paymentSystems": [
                 {
-                  "currency": "RUB",
-                  "countries": ["Russia"]
+                    "paymentSystem": "MIR",
+                    "type": "PSP",
+                    "directions": [
+                        {
+                            "direction": "SELL",
+                            "currencies": [
+                                {
+                                    "currency": "RUB",
+                                    "countries": [
+                                        "Russia"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
                 }
-              ]
+            ]
+        },
+        "commissions": [
+            {
+                "buyCommission": "2,5",
+                "sellCommission": "2,0"
+            },
+            {
+                "destination": "EXCHANGE",
+                "buyCommission": "2,5"
+            },
+            {
+                "destination": "SDK_EXCHANGE",
+                "buyCommission": "2,5",
+                "sellCommission": "2,0"
+            },
+            {
+                "destination": "ACCOUNTING",
+                "buyCommission": "0"
+            },
+            {
+                "bank": "RF_CARDS",
+                "destination": "EXCHANGE",
+                "sellCommission": "2,0"
+            },
+            {
+                "bank": "RF_CARDS",
+                "destination": "ACCOUNTING",
+                "sellCommission": "1,5"
             }
-          ]
-        }
-      ]
-    },
-    "commissions": [
-      {
-        "buyCommission": "2,5",
-        "sellCommission": "2,0"
-      }
-    ]
-  }
+        ]
+    }
 ]
 ```
 
@@ -550,8 +760,11 @@ Use the response to select provider and render allowed direction/currency combin
 | `config.paymentSystems[].directions[].direction` | `string` | Direction value. |
 | `config.paymentSystems[].directions[].currencies` | `array of objects` | Supported currencies. |
 | `config.paymentSystems[].directions[].currencies[].currency` | `string` | Currency code. |
+| `config.paymentSystems[].directions[].currencies[].banks` | `array of string` | Allowed banks for the currency, if configured. |
 | `config.paymentSystems[].directions[].currencies[].countries` | `array of string` | Optional country restrictions. |
 | `commissions` | `array of objects` | Commission settings. |
+| `commissions[].bank` | `string \| null` | Optional bank scope for commission rule. |
+| `commissions[].destination` | `string \| null` | Optional destination scope for commission rule. |
 | `commissions[].buyCommission` | `string` | Buy-side commission value/range. |
 | `commissions[].sellCommission` | `string` | Sell-side commission value/range. |
 
@@ -567,6 +780,7 @@ Use the response to select provider and render allowed direction/currency combin
 Possible session-related order events:
 - `order.processing`
 - `order.completed`
+- `order.error` (deprecated)
 - `order.expired`
 - `order.failed`
 
@@ -587,7 +801,7 @@ Example:
 | Name | Type | Description |
 | --- | --- | --- |
 | `id` | `string` | Webhook event id. |
-| `type` | `string` | Event type (`order.processing`, `order.completed`, `order.expired`, `order.failed`). |
+| `type` | `string` | Event type (`order.processing`, `order.completed`, `order.error`, `order.expired`, `order.failed`). |
 | `createdAt` | `string` | Event creation timestamp. |
 | `sessionId` | `string` | Session id related to the order event. |
 | `orderId` | `string` | Order id related to the event. |
