@@ -1,48 +1,19 @@
-# Session flow
+# Session Flow API
 
-Session API is an entry point for SDK-oriented exchange flow.  
-It prepares a pre-calculated exchange context (rates, fees, limits), returns `sessionId` for tracking, and builds ready-to-open SDK URL with required parameters.  
-Session itself does not create an order; order is created later inside order flow.
+Session API is an entry point for SDK-oriented exchange flows.
+It prepares pre-calculated exchange context (rates, fees, limits), returns `sessionId`, and provides ready-to-open SDK URL parameters.
 
----
-
-# Create Session
-
-### **POST** `/api/v3/exchange/merchant/session`
-
-Creates a session for fiat ↔ crypto or crypto ↔ fiat operations and returns an SDK URL.
-
-## Headers
-
-| Header | Required | Description |
-| --- | --- | --- |
-| `x-api-key` | ✅ Yes | Merchant API key |
-| `Content-Type` | ✅ Yes | `application/json` |
-
-### Request body
-
-```json
-{
-	"fromAsset":"BYN",
-	"fromAmount":"100",
-	"toAsset":"USDT_TRC",
-	"destinationCryptoAddress":"TCT2pKJXo233hrKWQMeCptC8My1KGvtsU4",
-	"externalClientId":"externalClientId",
-}
-```
-
+> BASE_URL https://api.dev.wbdevel.net
 
 ## Supported Assets
 
 ### Fiat
-
 - `BYN`
 - `RUB`
 - `USD`
 - `EUR`
 
 ### Crypto
-
 - `BTC`
 - `ETH`
 - `TRX`
@@ -52,47 +23,47 @@ Creates a session for fiat ↔ crypto or crypto ↔ fiat operations and returns 
 - `USDT_TRC`
 - `USDT_TON`
 
----
-
 ## Supported Payment Providers
 
-### Belarusian payment providers
+### Belarus
+- `ALFA` (`BYN`, `RUB`, `USD`, `EUR`)
+- `ASSIST` (`BYN`, `RUB`, `USD`, `EUR`)
+- `STATUSBANK` (`BYN`, `RUB`, `USD`, `EUR`)
+- `CA` (`BYN`, `RUB`, `USD`, `EUR`)
 
-- `ALFA` - BYN, RUB, USD, EUR
-- `ASSIST` - BYN, RUB, USD, EUR
-- `STATUSBANK` - BYN, RUB, USD, EUR
-- `CA` - BYN, RUB, USD, EUR
+### Russia
+- `SBER` (`RUB`)
+- `CARUSELL` (`RUB`)
+- `MTS` (`RUB`)
+- `VTB` (`RUB`)
+- `CA` (`BYN`, `RUB`, `USD`, `EUR`)
 
-### **Russian payment** providers
+### Tajikistan
+- `CORTI_MILLI` (`RUB`)
 
-- `SBER` - only RUB
-- `CARUSELL` - only RUB
-- `MTS` - only RUB
-- `VTB` - only RUB
-- `CA` - BYN, RUB, USD, EUR
+## 1) Session Endpoints
 
-### **Tajikistan payment** providers
+### Step 1. Create session
+Use this endpoint to create a pre-calculated exchange session for SDK flow without creating an order yet.
+Use the response `sessionId` and `sdk.url` to start the client flow and track it later.
 
-- `CORTI_MILLI` - only RUB
+**POST** `/api/v3/exchange/merchant/session`
 
+**Headers**
+- `x-api-key: {{x-api-key}}`
 
-## Request params (body fields)
+**Request**
+```json
+{
+  "fromAsset": "BYN",
+  "fromAmount": "100",
+  "toAsset": "USDT_TRC",
+  "destinationCryptoAddress": "TCT2pKJXo233hrKWQMeCptC8My1KGvtsU4",
+  "externalClientId": "externalClientId"
+}
+```
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `fromAsset` | string | ✅ | Source asset |
-| `fromAmount` | number | ⚠️ Conditionally | Only one of `fromAmount` or `toAmount` |
-| `toAsset` | string | ✅ | Target asset |
-| `toAmount` | number | ⚠️ Conditionally | Only one of `fromAmount` or `toAmount` |
-| `paymentMethod` | string | ❌ | Payment provider id |
-| `destinationCryptoAddress` | string | ✅ | Destination crypto wallet address |
-| `comment` | string | ❌ | Optional crypto transfer comment |
-| `externalClientId` | string | ✅ | External client identifier |
-| `redirectUrl` | string | ❌ | Redirect URL for SDK |
-| `email` | string | ❌ | Optional email for SDK |
-
-### Response
-
+**Response**
 ```json
 {
   "sessionId": "14500600-0631-46c4-9ae1-fab9e4c798f8",
@@ -109,16 +80,8 @@ Creates a session for fiat ↔ crypto or crypto ↔ fiat operations and returns 
     "actualRate": 0.2919,
     "exchangeRate": 0.2835,
     "fees": [
-      {
-        "type": "PERCENT",
-        "amount": -0.5,
-        "asset": "USD"
-      },
-      {
-        "type": "CRYPTO_FEE",
-        "amount": -0.263,
-        "asset": "TRX"
-      }
+      { "type": "PERCENT", "amount": -0.5, "asset": "USD" },
+      { "type": "CRYPTO_FEE", "amount": -0.263, "asset": "TRX" }
     ]
   },
   "limit": {
@@ -131,53 +94,74 @@ Creates a session for fiat ↔ crypto or crypto ↔ fiat operations and returns 
 }
 ```
 
-## Errors
-
-| Error Code | Description |
-| --- | --- |
-| `INVALID_AMOUNTS` | Amount not specified or both amounts provided |
-| `INVALID_DESTINATION_CRYPTO_ADDRESS` | Invalid destination crypto address |
-| `DESTINATION_ADDRESS_IS_INTERNAL` | Destination address is internal |
-| `INVALID_PAYMENT_PROVIDER` | Payment provider not found |
-| `Unauthorized` | Invalid API key / access denied |
-
----
-
-## Webhooks (code-aligned)
-
-Possible session-related order events:
-
-- `order.processing`
-- `order.completed`
-- `order.expired`
-- `order.failed`
-
-Example:
-
-```json
-{
-  "id": "webhook-id",
-  "type": "order.processing",
-  "createdAt": "2024-05-23T08:44:58+0000",
-  "sessionId": "3c0130a4-06f2-4d18-bf39-27153caff6f5",
-  "orderId": "e57e77fc-802c-4c0d-8c7c-08806c159725",
-  "externalClientId": "external-client-id-5"
-}
-```
-
----
-
-## `POST /api/v2/exchange/merchant/buy-limit`
-
 ### Headers
 
-| Header | Required | Description |
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `x-api-key` | `string` | Yes | Authenticates merchant backend request. |
+
+### Request
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `fromAsset` | `string` | Yes | Source asset code. |
+| `fromAmount` | `number` | Conditionally | Set either `fromAmount` or `toAmount`, but not both. |
+| `toAsset` | `string` | Yes | Target asset code. |
+| `toAmount` | `number` | Conditionally | Set either `fromAmount` or `toAmount`, but not both. |
+| `paymentMethod` | `string` | No | Payment provider id. |
+| `destinationCryptoAddress` | `string` | Yes | Destination crypto wallet address. |
+| `comment` | `string` | No | Optional crypto transfer comment. |
+| `externalClientId` | `string` | Yes | Merchant-side external client identifier. |
+| `redirectUrl` | `string` | No | Redirect URL for SDK flow. |
+| `email` | `string` | No | Optional prefilled email for SDK. |
+
+### Response
+
+| Name | Type | Description |
 | --- | --- | --- |
-| `x-api-key` | ✅ Yes | Merchant API key |
-| `Content-Type` | ✅ Yes | `application/json` |
+| `sessionId` | `string` | Session identifier used for tracking and downstream flow. |
+| `externalClientId` | `string` | Merchant-side external client identifier from request. |
+| `destinationCryptoAddress` | `string` | Destination crypto wallet used by session. |
+| `comment` | `string \| null` | Optional comment from request. |
+| `exchange` | `object` | Pre-calculated exchange values block. |
+| `exchange.fromAsset` | `string` | Source asset code. |
+| `exchange.fromGrossAmount` | `number` | Source amount before fees. |
+| `exchange.fromNetAmount` | `number` | Source amount after input-side fees. |
+| `exchange.toAsset` | `string` | Target asset code. |
+| `exchange.toGrossAmount` | `number` | Target amount before output-side fees. |
+| `exchange.toNetAmount` | `number` | Target amount after output-side fees. |
+| `exchange.actualRate` | `number` | Final client-facing rate. |
+| `exchange.exchangeRate` | `number` | Base/system exchange rate. |
+| `exchange.fees` | `array of objects` | Fee breakdown list. |
+| `exchange.fees[].type` | `string` | Fee type, e.g. `PERCENT`, `CRYPTO_FEE`. |
+| `exchange.fees[].amount` | `number` | Fee amount value. |
+| `exchange.fees[].asset` | `string` | Asset code used for this fee. |
+| `limit` | `object` | Limit block for current session pair. |
+| `limit.min` | `number` | Minimum allowed amount. |
+| `limit.max` | `number` | Maximum allowed amount. |
+| `sdk` | `object` | SDK launch parameters block. |
+| `sdk.url` | `string` | Ready-to-open SDK URL for current session. |
 
-### Request body
+### Errors
 
+| Name | Code | Description |
+| --- | --- | --- |
+| `400 INVALID_AMOUNTS` | BUSINESS | Amount is not specified, or both amounts are provided at once. |
+| `400 INVALID_DESTINATION_CRYPTO_ADDRESS` | BUSINESS | Destination crypto address is invalid. |
+| `400 DESTINATION_ADDRESS_IS_INTERNAL` | BUSINESS | Destination address belongs to internal address space. |
+| `400 INVALID_PAYMENT_PROVIDER` | BUSINESS | Payment provider not found or unsupported for current route. |
+| `401 Unauthorized` | HTTP | `x-api-key` is missing, invalid, or expired. |
+
+### Step 2. Get buy limit by fiat asset and provider
+Use this endpoint to retrieve min/max fiat amount boundaries for buy flow by asset and payment provider.
+Use the response to validate amount input before creating session/order.
+
+**POST** `/api/v2/exchange/merchant/buy-limit`
+
+**Headers**
+- `x-api-key: {{x-api-key}}`
+
+**Request**
 ```json
 {
   "asset": "RUB",
@@ -185,53 +169,58 @@ Example:
 }
 ```
 
-### Request params (body fields)
-
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `asset` | string | ✅ Yes | Fiat asset code |
-| `paymentMethod` | string | ✅ Yes | Payment provider |
-| `clientId` | string | ❌ | Merchant client id |
-
-### Response
-
+**Response**
 ```json
 {
-  "asset": {
-    "id": "RUB",
-    "code": "RUB"
-  },
+  "asset": { "id": "RUB", "code": "RUB" },
   "min": 947.37,
   "max": 3735526.32
 }
 ```
 
-### Errors
-
-| Error Code | Description |
-| --- | --- |
-| `INVALID_PAYMENT_PROVIDER` | Payment provider not found |
-| `Unauthorized` | Invalid API key / access denied |
-
----
-
-## `GET /api/v3/exchange/merchant/order/current`
-
 ### Headers
 
-| Header | Required | Description |
-| --- | --- | --- |
-| `x-api-key` | ✅ Yes | Merchant API key |
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `x-api-key` | `string` | Yes | Authenticates merchant backend request. |
 
-### Request params
+### Request
 
-| Param | Required | Description |
-| --- | --- | --- |
-| `externalClientId` | ⚠️ Conditionally required (required if externalClientId is not provided) | External client id (alternative to `clientId`) |
-| `clientId` | ⚠️ Conditionally required (required if сlientId is not provided) | Client id (alternative to `externalClientId`) |
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `asset` | `string` | Yes | Fiat asset code. |
+| `paymentMethod` | `string` | Yes | Payment provider code. |
+| `clientId` | `string` | No | Merchant client id, if limit is client-context dependent. |
 
 ### Response
 
+| Name | Type | Description |
+| --- | --- | --- |
+| `asset` | `object` | Asset for which limit values are returned. |
+| `asset.id` | `string` | Internal asset identifier. |
+| `asset.code` | `string` | Asset code. |
+| `min` | `number` | Minimum allowed amount. |
+| `max` | `number` | Maximum allowed amount. |
+
+### Errors
+
+| Name | Code | Description |
+| --- | --- | --- |
+| `400 INVALID_PAYMENT_PROVIDER` | BUSINESS | Payment provider not found or unsupported. |
+| `401 Unauthorized` | HTTP | `x-api-key` is missing, invalid, or expired. |
+
+## 2) Order Tracking Endpoints
+
+### Step 3. Get current order by client reference
+Use this endpoint to retrieve currently active order for client context.
+Use the response to restore session/order state in SDK integration.
+
+**GET** `/api/v3/exchange/merchant/order/current`
+
+**Headers**
+- `x-api-key: {{x-api-key}}`
+
+**Response**
 ```json
 {
   "id": "5289b6f0-4945-4b74-b243-4fad013eed50",
@@ -257,36 +246,67 @@ Example:
 }
 ```
 
-### Errors
-
-| Error Code | Description |
-| --- | --- |
-| `Unauthorized` | Invalid API key / access denied |
-| `Invalid external client id` | External client does not belong to merchant |
-
----
-
-## `POST /api/v3/exchange/merchant/order/history`
-
 ### Headers
 
-| Header | Required | Description |
-| --- | --- | --- |
-| `x-api-key` | ✅ Yes | Merchant API key |
-| `Content-Type` | ✅ Yes | `application/json` |
-
-### Request params (body fields)
-
-| Field | Type | Required | Description |
+| Name | Type | Required | Description |
 | --- | --- | --- | --- |
-| `externalClientId` | string | ❌ | External client id |
-| `sessionIds` | UUID[] | ❌ | Filter by session ids |
-| `clientIds` / `clientId` | string[] / string | ✅ Yes | Alternative client filter |
-| `statuses` | string[] | ❌ | Order status filter |
-| `creationDateFrame` | object | ❌ | Creation date filter |
+| `x-api-key` | `string` | Yes | Authenticates merchant backend request. |
+
+### Params
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `externalClientId` | `string` | Conditionally | Required when `clientId` is not provided. |
+| `clientId` | `string` | Conditionally | Required when `externalClientId` is not provided. |
 
 ### Response
 
+| Name | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | Order id. |
+| `number` | `number` | Human-readable order number. |
+| `conditions` | `object` | Rate block used in order. |
+| `conditions.rate` | `string` | Rate pair code. |
+| `conditions.systemRateValue` | `number` | System/base rate value. |
+| `conditions.exchangeRateValue` | `number` | Exchange rate value. |
+| `conditions.actualRateValue` | `number` | Actual final rate value. |
+| `sessionId` | `string` | Session id linked to this order. |
+| `status` | `string` | Current order status. |
+| `input` | `object` | Input operation details. |
+| `input.type` | `string` | Input operation type. |
+| `input.asset` | `string` | Input asset code. |
+| `input.amount` | `number` | Input amount. |
+| `output` | `object` | Output operation details. |
+| `output.type` | `string` | Output operation type. |
+| `output.asset` | `string` | Output asset code. |
+| `output.amount` | `number` | Output amount. |
+
+### Errors
+
+| Name | Code | Description |
+| --- | --- | --- |
+| `401 Unauthorized` | HTTP | `x-api-key` is missing, invalid, or expired. |
+| `400 Invalid external client id` | BUSINESS | External client id is invalid for merchant scope. |
+
+### Step 4. Get order history with filters
+Use this endpoint to retrieve paginated order history for client/session filters.
+Use the response to build order history UI, analytics, and reconciliation flows.
+
+**POST** `/api/v3/exchange/merchant/order/history`
+
+**Headers**
+- `x-api-key: {{x-api-key}}`
+
+**Request**
+```json
+{
+  "externalClientId": "external-client-id-1",
+  "sessionIds": ["14500600-0631-46c4-9ae1-fab9e4c798f8"],
+  "statuses": ["COMPLETED"]
+}
+```
+
+**Response**
 ```json
 {
   "content": [
@@ -304,36 +324,65 @@ Example:
 }
 ```
 
-### Errors
-
-| Error Code | Description |
-| --- | --- |
-| `Unauthorized` | Invalid API key / access denied |
-| `Client id is required` | Neither external client id nor client id provided |
-
----
-
-## `POST /api/v2/exchange/merchant/payment/provider`
-
 ### Headers
 
-| Header | Required | Description |
-| --- | --- | --- |
-| `x-api-key` | ✅ Yes | Merchant API key |
-| `Content-Type` | ✅ Yes | `application/json` |
-
-### Request params (body fields)
-
-| Field | Type | Required | Description |
+| Name | Type | Required | Description |
 | --- | --- | --- | --- |
-| `clientId` | string | ❌ | Merchant client id |
-| `fiatAsset` | string | ❌ | Fiat asset filter |
-| `orderType` | string | ❌ | `BUY` / `SELL` filter |
-| `destination` | string | ❌ | Merchant destination filter |
-| `providers` / `isCrypto` / `countryGroup` | varies | ❌ | Optional filters |
+| `x-api-key` | `string` | Yes | Authenticates merchant backend request. |
+
+### Request
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `externalClientId` | `string` | No | External client id filter. |
+| `sessionIds` | `array of string` | No | Filter by session ids. |
+| `clientIds` | `array of string` | Conditionally | Alternative client filter. |
+| `clientId` | `string` | Conditionally | Alternative client filter. |
+| `statuses` | `array of string` | No | Order status filter list. |
+| `creationDateFrame` | `object` | No | Creation date range filter object. |
 
 ### Response
 
+| Name | Type | Description |
+| --- | --- | --- |
+| `content` | `array of objects` | Page content list. |
+| `content[].id` | `string` | Order id. |
+| `content[].number` | `number` | Order number. |
+| `content[].sessionId` | `string` | Related session id. |
+| `content[].status` | `string` | Order status value. |
+| `totalElements` | `number` | Total matched records. |
+| `totalPages` | `number` | Total pages count. |
+| `number` | `number` | Current page number. |
+| `size` | `number` | Page size. |
+
+### Errors
+
+| Name | Code | Description |
+| --- | --- | --- |
+| `401 Unauthorized` | HTTP | `x-api-key` is missing, invalid, or expired. |
+| `400 Client id is required` | BUSINESS | Neither client id nor external client id is provided. |
+
+## 3) Provider Discovery Endpoint
+
+### Step 5. Get available payment providers
+Use this endpoint to fetch providers and payment system routes for current merchant/client context.
+Use the response to select provider and render allowed direction/currency combinations in UI.
+
+**POST** `/api/v2/exchange/merchant/payment/provider`
+
+**Headers**
+- `x-api-key: {{x-api-key}}`
+
+**Request**
+```json
+{
+  "fiatAsset": "RUB",
+  "orderType": "BUY",
+  "destination": "CARD"
+}
+```
+
+**Response**
 ```json
 [
   {
@@ -369,17 +418,74 @@ Example:
 ]
 ```
 
+### Headers
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `x-api-key` | `string` | Yes | Authenticates merchant backend request. |
+
+### Request
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `clientId` | `string` | No | Merchant client id. |
+| `fiatAsset` | `string` | No | Fiat asset filter. |
+| `orderType` | `string` | No | Direction filter (`BUY`/`SELL`). |
+| `destination` | `string` | No | Merchant destination filter. |
+| `providers` | `array of string` | No | Explicit provider filter list. |
+| `isCrypto` | `boolean` | No | Crypto-method filter. |
+| `countryGroup` | `array of string` | No | Country-group filter. |
+
+### Response
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | Provider id. |
+| `name` | `string` | Provider display name. |
+| `addPaymentMethod` | `boolean` | Whether provider supports payment-method binding. |
+| `config` | `object` | Provider routing configuration. |
+| `config.paymentSystems` | `array of objects` | Payment systems list. |
+| `config.paymentSystems[].paymentSystem` | `string` | Payment system name. |
+| `config.paymentSystems[].type` | `string` | Provider channel type. |
+| `config.paymentSystems[].directions` | `array of objects` | Supported directions. |
+| `config.paymentSystems[].directions[].direction` | `string` | Direction value. |
+| `config.paymentSystems[].directions[].currencies` | `array of objects` | Supported currencies. |
+| `config.paymentSystems[].directions[].currencies[].currency` | `string` | Currency code. |
+| `config.paymentSystems[].directions[].currencies[].countries` | `array of string` | Optional country restrictions. |
+| `commissions` | `array of objects` | Commission settings. |
+| `commissions[].buyCommission` | `string` | Buy-side commission value/range. |
+| `commissions[].sellCommission` | `string` | Sell-side commission value/range. |
+
 ### Errors
 
-| Error Code | Description |
-| --- | --- |
-| `Unauthorized` | Invalid API key / access denied |
-| `Invalid external user id` | External client id validation failed |
+| Name | Code | Description |
+| --- | --- | --- |
+| `401 Unauthorized` | HTTP | `x-api-key` is missing, invalid, or expired. |
+| `400 Invalid external user id` | BUSINESS | External client id validation failed in merchant scope. |
 
----
+## 4) Webhooks
 
-### How these values are calculated:
+Possible session-related order events:
+- `order.processing`
+- `order.completed`
+- `order.expired`
+- `order.failed`
 
+Example:
+```json
+{
+  "id": "webhook-id",
+  "type": "order.processing",
+  "createdAt": "2024-05-23T08:44:58+0000",
+  "sessionId": "3c0130a4-06f2-4d18-bf39-27153caff6f5",
+  "orderId": "e57e77fc-802c-4c0d-8c7c-08806c159725",
+  "externalClientId": "external-client-id-5"
+}
+```
+
+## 5) Quote/Rate Notes
+
+How these values are calculated:
 - `plainRate` = base market rate (bid/ask) before final quote adjustments.
 - `rate` (final client rate):
   - for SELL: `rate = toAmount / fromGrossAmount`
@@ -394,14 +500,13 @@ Example:
 - network fee in response:
   - if input is CRYPTO: `fee.network = fromPaymentFeeAmount`
   - if input is FIAT: `fee.network = toPaymentFeeAmount`
-- `fee.service = null` (service part is not returned as separate value in this response format).
+- `fee.service = null` (service part is not returned separately in this response format).
 
-### Variables:
-
+Variables:
 - `fromGrossAmount`: how much the client gives before deductions.
 - `fromAmount`: amount left from input side after input-side fees.
 - `toAmount`: final amount the client receives after output-side fees.
-- `amount`: current amount used in fee formula on current calculation step.
-- `percent`: fee percent configured for this fee rule (for example `2.5` means `2.5%`).
-- `fromPaymentFeeAmount` / `toPaymentFeeAmount`: payment/transfer part of fee (card processor or blockchain/network).
-- `fromExchangeFeeAmount` / `toExchangeFeeAmount`: exchange service part of fee.
+- `amount`: current amount used in fee formula on current step.
+- `percent`: fee percent configured for rule (e.g. `2.5` means `2.5%`).
+- `fromPaymentFeeAmount` / `toPaymentFeeAmount`: payment/transfer fee part.
+- `fromExchangeFeeAmount` / `toExchangeFeeAmount`: exchange service fee part.
