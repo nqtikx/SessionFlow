@@ -50,7 +50,7 @@ Use the response `sessionId` and `sdk.url` to start the client flow and track it
 **POST** `/api/v3/exchange/merchant/session`
 
 **Headers**
-- `x-api-key: {{x-api-key}}`
+`x-api-key: {{x-api-key}}`
 
 **Request**
 ```json
@@ -159,7 +159,7 @@ Use the response to validate amount input before creating session/order.
 **POST** `/api/v2/exchange/merchant/buy-limit`
 
 **Headers**
-- `x-api-key: {{x-api-key}}`
+`x-api-key: {{x-api-key}}`
 
 **Request**
 ```json
@@ -218,7 +218,7 @@ Use the response to restore session/order state in SDK integration.
 **GET** `/api/v3/exchange/merchant/order/current`
 
 **Headers**
-- `x-api-key: {{x-api-key}}`
+`x-api-key: {{x-api-key}}`
 
 **Response**
 ```json
@@ -295,7 +295,7 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 **POST** `/api/v3/exchange/merchant/order/history`
 
 **Headers**
-- `x-api-key: {{x-api-key}}`
+`x-api-key: {{x-api-key}}`
 
 **Request**
 ```json
@@ -371,7 +371,7 @@ Use the response to select provider and render allowed direction/currency combin
 **POST** `/api/v2/exchange/merchant/payment/provider`
 
 **Headers**
-- `x-api-key: {{x-api-key}}`
+`x-api-key: {{x-api-key}}`
 
 **Request**
 ```json
@@ -482,6 +482,17 @@ Example:
   "externalClientId": "external-client-id-5"
 }
 ```
+
+### Response
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | Webhook event id. |
+| `type` | `string` | Event type (`order.processing`, `order.completed`, `order.expired`, `order.failed`). |
+| `createdAt` | `string` | Event creation timestamp. |
+| `sessionId` | `string` | Session id related to the order event. |
+| `orderId` | `string` | Order id related to the event. |
+| `externalClientId` | `string` | Merchant external client identifier from order context. |
 
 ## 5) Quote/Rate Notes
 
