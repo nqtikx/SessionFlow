@@ -18,10 +18,16 @@ It prepares pre-calculated exchange context (rates, fees, limits), returns `sess
 - `ETH`
 - `TRX`
 - `TON`
+- `BNB`
+- `SOL`
 - `USDT_ERC`
 - `USDC_ERC`
 - `USDT_TRC`
 - `USDT_TON`
+- `USDT_BNB`
+- `USDC_BNB`
+- `USDT_SPL`
+- `USDC_SPL`
 
 ## Supported Payment Providers
 
