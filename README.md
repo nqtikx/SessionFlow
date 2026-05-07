@@ -106,7 +106,7 @@ Use the response `sessionId` and `sdk.url` to start the client flow and track it
 
 | Name | Type | Required | Description |
 | --- | --- | --- | --- |
-| `x-api-key` | `string` | Yes | Authenticates merchant backend request. |
+| `x-api-key` | `string` | Yes | Authenticates the merchant server-to-server request. Use the API key issued for the merchant and target environment. |
 
 ### Request
 
@@ -117,8 +117,8 @@ Use the response `sessionId` and `sdk.url` to start the client flow and track it
 | `toAsset` | `string` | Yes | Target asset code. |
 | `toAmount` | `number` | Conditionally | Set either `fromAmount` or `toAmount`, but not both. |
 | `paymentMethod` | `string` | No | Payment provider id. |
-| `destinationCryptoAddress` | `string` | Yes | Destination crypto wallet address. The address must belong to the network selected in `toAsset`. |
-| `comment` | `string` | No | Optional crypto transfer comment. |
+| `destinationCryptoAddress` | `string` | Yes | Destination wallet address for crypto-out flows (used when output.type is CRYPTO_TRANSFER). |
+| `comment` | `string` | No | Used only for the TON network as a transfer memo for the recipient. For other networks the value is ignored. |
 | `externalClientId` | `string` | Yes | Merchant-side external client identifier. |
 | `redirectUrl` | `string` | No | Redirect URL for SDK flow. |
 | `email` | `string` | No | Optional prefilled email for SDK. |
@@ -129,8 +129,8 @@ Use the response `sessionId` and `sdk.url` to start the client flow and track it
 | --- | --- | --- |
 | `sessionId` | `string` | Session identifier used for tracking and downstream flow. |
 | `externalClientId` | `string` | Merchant-side external client identifier from request. |
-| `destinationCryptoAddress` | `string` | Destination crypto wallet used by session. The address must belong to the network selected in `toAsset`. |
-| `comment` | `string \| null` | Optional comment from request. |
+| `destinationCryptoAddress` | `string` | Destination wallet address for crypto-out flows (used when output.type is CRYPTO_TRANSFER). |
+| `comment` | `string \| null` | Used only for the TON network as a transfer memo for the recipient. For other networks the value is ignored.|
 | `exchange` | `object` | Pre-calculated exchange values block. |
 | `exchange.fromAsset` | `string` | Source asset code. |
 | `exchange.fromGrossAmount` | `number` | Source amount before fees. |
@@ -190,7 +190,7 @@ Use the response to validate amount input before creating session/order.
 
 | Name | Type | Required | Description |
 | --- | --- | --- | --- |
-| `x-api-key` | `string` | Yes | Authenticates merchant backend request. |
+| `x-api-key` | `string` | Yes | Authenticates the merchant server-to-server request. Use the API key issued for the merchant and target environment. |
 
 ### Request
 
@@ -295,7 +295,7 @@ Use the response to restore session/order state in SDK integration.
 
 | Name | Type | Required | Description |
 | --- | --- | --- | --- |
-| `x-api-key` | `string` | Yes | Authenticates merchant backend request. |
+| `x-api-key` | `string` | Yes | Authenticates the merchant server-to-server request. Use the API key issued for the merchant and target environment. |
 
 ### Params
 
@@ -322,9 +322,9 @@ Use the response to restore session/order state in SDK integration.
 | `conditions.toFeeAmount` | `number` | Target-side fee amount in `conditions.toAsset` currency. |
 | `conditions.promoCode` | `string \| null` | Promo code used in order conditions. |
 | `conditions.rate` | `string` | Rate pair code. |
-| `conditions.systemRateValue` | `number` | System/base rate value. |
-| `conditions.exchangeRateValue` | `number` | Exchange rate value. |
-| `conditions.actualRateValue` | `number` | Actual final rate value. |
+| `conditions.systemRateValue` | `number` | Base system rate at the moment of quote calculation. Used as a reference value. |
+| `conditions.exchangeRateValue` | `number` | Rate used by the exchange engine to calculate the quote. |
+| `conditions.actualRateValue` | `number` | Final client-facing rate applied to the quote/order. Show this value to the client. |
 | `recalculationReason` | `string \| null` | Recalculation reason enum value, if order was recalculated. |
 | `clientId` | `string` | Internal client id. |
 | `sessionId` | `string \| null` | Session id linked to this order. |
@@ -521,7 +521,7 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 
 | Name | Type | Required | Description |
 | --- | --- | --- | --- |
-| `x-api-key` | `string` | Yes | Authenticates merchant backend request. |
+| `x-api-key` | `string` | Yes | Authenticates the merchant server-to-server request. Use the API key issued for the merchant and target environment. |
 
 ### Request
 
@@ -530,18 +530,18 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 | `externalClientId` | `string` | No | External client id filter. |
 | `sessionIds` | `array of string` | No | Filter by session ids (`UUID`). |
 | `clientIds` | `array of string` | Conditionally | Required when `externalClientId` is not provided (first value is used for merchant access validation). |
-| `statuses` | `array of string` | No | Order status filter list. Allowed values: `PROCESSING`, `EXPIRED`, `COMPLETED`, `FAILED`. |
-| `creationDateFrame` | `object` | No | Creation date range filter object. |
+| `statuses` | `array of string` | No | Filter by order status. Allowed values: PROCESSING, EXPIRED, COMPLETED, FAILED. |
+| `creationDateFrame` | `object` | No | Creation date range filter.|
 | `numbers` | `array of number` | No | Filter by order numbers. |
 | `orderIds` | `array of string` | No | Filter by order ids (`UUID`). |
 | `inputAssets` | `array of string` | No | Filter by input asset ids. |
 | `outputAssets` | `array of string` | No | Filter by output asset ids. |
-| `assets` | `array of string` | No | Filter by any operation asset ids. |
+| `assets` | `array of string` | No | Asset filter applied to either source or destination leg. |
 | `inputOperationTypes` | `array of string` | No | Filter by input operation type enum values. |
 | `outputOperationTypes` | `array of string` | No | Filter by output operation type enum values. |
 | `operationTypes` | `array of string` | No | Filter by any operation type enum values. |
 | `recalculationReasons` | `array of string` | No | Filter by recalculation reason enum values. |
-| `completionDateFrame` | `object` | No | Completion date range filter object. |
+| `completionDateFrame` | `object` | No | Completion date range filter.|
 | `fiatTransactionProviders` | `array of string` | No | Filter by fiat provider ids. |
 | `cryptoTransactionAddresses` | `array of string` | No | Filter by crypto addresses. |
 | `cryptoTransactionHashes` | `array of string` | No | Filter by transaction hashes. |
@@ -656,9 +656,9 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 | `pageable.offset` | `number` | Current page offset. |
 | `pageable.paged` | `boolean` | Indicates paged request mode. |
 | `pageable.unpaged` | `boolean` | Indicates unpaged request mode. |
-| `totalElements` | `number` | Total matched records. |
-| `totalPages` | `number` | Total pages count. |
-| `last` | `boolean` | Whether current page is the last page. |
+| `totalElements` | `number` | Total number of matching orders. |
+| `totalPages` | `number` | Total number of pages. |
+| `last` | `boolean` | true when current page is last page. |
 | `numberOfElements` | `number` | Number of elements in current page. |
 | `number` | `number` | Current page number. |
 | `size` | `number` | Page size. |
@@ -666,8 +666,8 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 | `sort.unsorted` | `boolean` | Whether page content is unsorted. |
 | `sort.sorted` | `boolean` | Whether page content is sorted. |
 | `sort.empty` | `boolean` | Whether sort metadata is empty. |
-| `first` | `boolean` | Whether current page is the first page. |
-| `empty` | `boolean` | Whether page content is empty. |
+| `first` | `boolean` | true when current page is first page. |
+| `empty` | `boolean` | true when content array is empty. |
 
 ### Errors
 
@@ -759,7 +759,7 @@ Use the response to select provider and render allowed direction/currency combin
 
 | Name | Type | Required | Description |
 | --- | --- | --- | --- |
-| `x-api-key` | `string` | Yes | Authenticates merchant backend request. |
+| `x-api-key` | `string` | Yes | Authenticates the merchant server-to-server request. Use the API key issued for the merchant and target environment. |
 
 ### Request
 
