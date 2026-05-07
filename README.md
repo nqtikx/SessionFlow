@@ -117,7 +117,7 @@ Use the response `sessionId` and `sdk.url` to start the client flow and track it
 | `toAsset` | `string` | Yes | Target asset code. |
 | `toAmount` | `number` | Conditionally | Set either `fromAmount` or `toAmount`, but not both. |
 | `paymentMethod` | `string` | No | Payment provider id. |
-| `destinationCryptoAddress` | `string` | Yes | Destination crypto wallet address. |
+| `destinationCryptoAddress` | `string` | Yes | Destination crypto wallet address. The address must belong to the network selected in `toAsset`. |
 | `comment` | `string` | No | Optional crypto transfer comment. |
 | `externalClientId` | `string` | Yes | Merchant-side external client identifier. |
 | `redirectUrl` | `string` | No | Redirect URL for SDK flow. |
@@ -129,7 +129,7 @@ Use the response `sessionId` and `sdk.url` to start the client flow and track it
 | --- | --- | --- |
 | `sessionId` | `string` | Session identifier used for tracking and downstream flow. |
 | `externalClientId` | `string` | Merchant-side external client identifier from request. |
-| `destinationCryptoAddress` | `string` | Destination crypto wallet used by session. |
+| `destinationCryptoAddress` | `string` | Destination crypto wallet used by session. The address must belong to the network selected in `toAsset`. |
 | `comment` | `string \| null` | Optional comment from request. |
 | `exchange` | `object` | Pre-calculated exchange values block. |
 | `exchange.fromAsset` | `string` | Source asset code. |
@@ -142,7 +142,7 @@ Use the response `sessionId` and `sdk.url` to start the client flow and track it
 | `exchange.exchangeRate` | `number` | Base/system exchange rate. |
 | `exchange.fees` | `array of objects` | Fee breakdown list. |
 | `exchange.fees[].type` | `string` | Fee type, e.g. `PERCENT`, `CRYPTO_FEE`. |
-| `exchange.fees[].amount` | `number` | Fee amount value. |
+| `exchange.fees[].amount` | `number` | Fee amount value in the asset specified by `exchange.fees[].asset`. |
 | `exchange.fees[].asset` | `string` | Asset code used for this fee. |
 | `limit` | `object` | Limit block for current session pair. |
 | `limit.min` | `number` | Minimum allowed amount. |
@@ -303,7 +303,7 @@ Use the response to restore session/order state in SDK integration.
 | --- | --- | --- | --- |
 | `clientId` | `string` | Conditionally | Required when `externalClientId` query param is not provided. |
 | `externalClientId` | `string` | Conditionally | Required when `clientId` query param is not provided. |
-| `destination` | `string` | No | Destination filter, default value is `EXCHANGE`. |
+| `destination` | `string` | No | Optional destination filter. Recommended value: `EXCHANGE`. |
 
 ### Response
 
@@ -316,10 +316,10 @@ Use the response to restore session/order state in SDK integration.
 | `conditions.toAsset` | `string` | Target asset id. |
 | `conditions.fromGrossAmount` | `number` | Source amount before source-side fee. |
 | `conditions.fromNetAmount` | `number` | Source amount after source-side fee. |
-| `conditions.fromFeeAmount` | `number` | Source-side fee amount. |
+| `conditions.fromFeeAmount` | `number` | Source-side fee amount in `conditions.fromAsset` currency. |
 | `conditions.toGrossAmount` | `number` | Target amount before target-side fee. |
 | `conditions.toNetAmount` | `number` | Target amount after target-side fee. |
-| `conditions.toFeeAmount` | `number` | Target-side fee amount. |
+| `conditions.toFeeAmount` | `number` | Target-side fee amount in `conditions.toAsset` currency. |
 | `conditions.promoCode` | `string \| null` | Promo code used in order conditions. |
 | `conditions.rate` | `string` | Rate pair code. |
 | `conditions.systemRateValue` | `number` | System/base rate value. |
@@ -328,7 +328,7 @@ Use the response to restore session/order state in SDK integration.
 | `recalculationReason` | `string \| null` | Recalculation reason enum value, if order was recalculated. |
 | `clientId` | `string` | Internal client id. |
 | `sessionId` | `string \| null` | Session id linked to this order. |
-| `status` | `string` | Current order status. |
+| `status` | `string` | Current order status. Allowed values: `PROCESSING`, `EXPIRED`, `COMPLETED`, `FAILED`. |
 | `failureMessage` | `string \| null` | Technical/business failure reason for failed flow. |
 | `completionDate` | `string \| null` | Completion timestamp. |
 | `creationDate` | `string` | Creation timestamp. |
@@ -337,8 +337,8 @@ Use the response to restore session/order state in SDK integration.
 | `input.asset` | `string` | Input asset code. |
 | `input.amount` | `number` | Input amount. |
 | `input.transactionAmount` | `number \| null` | Provider/blockchain transaction amount. |
-| `input.feeAmount` | `number \| null` | Input-side operation fee amount. |
-| `input.status` | `string \| null` | Operation status. |
+| `input.feeAmount` | `number \| null` | Input-side operation fee amount in `input.asset` currency. |
+| `input.status` | `string \| null` | Operation status. Allowed values: `NEW`, `PROCESSING`, `EXPIRED`, `COMPLETED`, `FAILED`. |
 | `input.failureMessage` | `string \| null` | Operation failure details. |
 | `input.expirationDate` | `string \| null` | Operation expiration timestamp. |
 | `input.provider` | `string \| null` | Fiat-provider specific field (`FIAT_PROVIDER`). |
@@ -361,8 +361,8 @@ Use the response to restore session/order state in SDK integration.
 | `output.asset` | `string` | Output asset code. |
 | `output.amount` | `number` | Output amount. |
 | `output.transactionAmount` | `number \| null` | Provider/blockchain transaction amount. |
-| `output.feeAmount` | `number \| null` | Output-side operation fee amount. |
-| `output.status` | `string \| null` | Operation status. |
+| `output.feeAmount` | `number \| null` | Output-side operation fee amount in `output.asset` currency. |
+| `output.status` | `string \| null` | Operation status. Allowed values: `NEW`, `PROCESSING`, `EXPIRED`, `COMPLETED`, `FAILED`. |
 | `output.failureMessage` | `string \| null` | Operation failure details. |
 | `output.expirationDate` | `string \| null` | Operation expiration timestamp. |
 | `output.provider` | `string \| null` | Fiat-provider specific field (`FIAT_PROVIDER`). |
@@ -400,7 +400,26 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 **Request**
 ```json
 {
-    "clientIds": ["{{clientId}}"]
+    "clientIds": [
+        "{{clientId}}"
+    ],
+    "operationTypes": [
+        "FIAT_PROVIDER",
+        "CRYPTO_TRANSFER"
+    ],
+    "statuses": [
+        "PROCESSING",
+        "COMPLETED",
+        "FAILED"
+    ],
+    "assets": [
+        "BYN",
+        "RUB",
+        "USD",
+    ],
+    "destinations": [
+        "EXCHANGE"
+    ]
 }
 ```
 
@@ -409,29 +428,29 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 {
   "content": [
         {
-            "id": "7f0ec09a-2ea7-410b-bc5c-09e94ec2ccb1",
-            "number": 911000004333,
+            "id": "f8e67902-6dd3-4554-8f50-cd0a5c8a894b",
+            "number": 491000004334,
             "conditions": {
                 "fromAsset": "BYN",
                 "toAsset": "TRX",
                 "fromGrossAmount": "50",
                 "fromNetAmount": "46.65",
                 "fromFeeAmount": "3.35",
-                "toGrossAmount": "44.838524",
-                "toNetAmount": "44.838524",
-                "toFeeAmount": "0",
+                "toGrossAmount": "44.955189",
+                "toNetAmount": "44.692189",
+                "toFeeAmount": "0.263",
                 "promoCode": null,
                 "rate": "TRX/BYN",
-                "systemRateValue": "1.0404",
-                "exchangeRateValue": "1.0404",
-                "actualRateValue": "1.1151"
+                "systemRateValue": "1.0377",
+                "exchangeRateValue": "1.0377",
+                "actualRateValue": "1.1188"
             },
             "recalculationReason": "NONE",
             "clientId": "3e1469fa-8d35-441c-87b1-a007aeba2562",
             "status": "COMPLETED",
             "failureMessage": null,
-            "completionDate": "2026-05-06T17:13:36+0000",
-            "creationDate": "2026-05-06T17:12:11+0000",
+            "completionDate": "2026-05-06T17:47:28+0000",
+            "creationDate": "2026-05-06T17:44:59+0000",
             "sessionId": null,
             "input": {
                 "type": "FIAT_PROVIDER",
@@ -447,22 +466,26 @@ Use the response to build order history UI, analytics, and reconciliation flows.
                 "processingBank": "BELARUSBANK",
                 "clientBank": null,
                 "fromToken": "fc4b130e-c3bf-4a3d-abe5-9ec5900c9868",
-                "toToken": "50d53e2e-f086-472a-9ce2-cdcee43279cb",
+                "toToken": "97fe9aa7-7805-438f-8c5e-aea24b4f9dc4",
                 "link": "https://payments.t.paysecure.ru/pay/p2p/cc2mc.cfm...",
-                "processorTransactionId": "36b7f4d1d15849deb1002e471fdd219a",
+                "processorTransactionId": "97e3d1f09aed4442a793fb5eace5582b",
                 "post": null,
                 "paymentSystem": null,
                 "processorTransactionNumber": null
             },
             "output": {
-                "type": "INTERNAL_BALANCE",
+                "type": "CRYPTO_TRANSFER",
                 "asset": "TRX",
-                "amount": "44.838524",
-                "transactionAmount": "44.838524",
-                "feeAmount": "0",
+                "amount": "44.955189",
+                "transactionAmount": "44.692189",
+                "feeAmount": "0.263",
                 "status": "COMPLETED",
                 "failureMessage": null,
-                "expirationDate": null
+                "expirationDate": null,
+                "fromAddress": "TVEwq1PiFDfJKYvWiDFhVXQkzDwqWCyPXV",
+                "toAddress": "TCT2pKJXo233hrKWQMeCptC8My1KGvtsU4",
+                "comment": null,
+                "hash": "8bd6f85d606d9511d28471a91b72dce634b61b51b4bcef45fb5c29f5e4d94875"
             }
         },
   ],
@@ -507,7 +530,7 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 | `externalClientId` | `string` | No | External client id filter. |
 | `sessionIds` | `array of string` | No | Filter by session ids (`UUID`). |
 | `clientIds` | `array of string` | Conditionally | Required when `externalClientId` is not provided (first value is used for merchant access validation). |
-| `statuses` | `array of string` | No | Order status filter list. |
+| `statuses` | `array of string` | No | Order status filter list. Allowed values: `PROCESSING`, `EXPIRED`, `COMPLETED`, `FAILED`. |
 | `creationDateFrame` | `object` | No | Creation date range filter object. |
 | `numbers` | `array of number` | No | Filter by order numbers. |
 | `orderIds` | `array of string` | No | Filter by order ids (`UUID`). |
@@ -545,7 +568,7 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 | `outputAmount` | `object` | No | Output amount range filter. |
 | `outputAmount.from` | `number` | No | Output amount lower bound. |
 | `outputAmount.to` | `number` | No | Output amount upper bound. |
-| `destinations` | `array of string` | No | Destination enum values. |
+| `destinations` | `array of string` | No | Destination enum values. Recommended value for SDK flows: `EXCHANGE`. |
 
 ### Response
 
@@ -559,10 +582,10 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 | `content[].conditions.toAsset` | `string` | Target asset id. |
 | `content[].conditions.fromGrossAmount` | `number` | Source amount before source-side fee. |
 | `content[].conditions.fromNetAmount` | `number` | Source amount after source-side fee. |
-| `content[].conditions.fromFeeAmount` | `number` | Source-side fee amount. |
+| `content[].conditions.fromFeeAmount` | `number` | Source-side fee amount in `content[].conditions.fromAsset` currency. |
 | `content[].conditions.toGrossAmount` | `number` | Target amount before target-side fee. |
 | `content[].conditions.toNetAmount` | `number` | Target amount after target-side fee. |
-| `content[].conditions.toFeeAmount` | `number` | Target-side fee amount. |
+| `content[].conditions.toFeeAmount` | `number` | Target-side fee amount in `content[].conditions.toAsset` currency. |
 | `content[].conditions.promoCode` | `string \| null` | Promo code used in order conditions. |
 | `content[].conditions.rate` | `string` | Rate pair code. |
 | `content[].conditions.systemRateValue` | `number` | System/base rate value. |
@@ -574,8 +597,8 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 | `content[].input.asset` | `string` | Input asset code. |
 | `content[].input.amount` | `number` | Input amount. |
 | `content[].input.transactionAmount` | `number \| null` | Provider/blockchain transaction amount. |
-| `content[].input.feeAmount` | `number \| null` | Input-side operation fee amount. |
-| `content[].input.status` | `string \| null` | Operation status. |
+| `content[].input.feeAmount` | `number \| null` | Input-side operation fee amount in `content[].input.asset` currency. |
+| `content[].input.status` | `string \| null` | Operation status. Allowed values: `NEW`, `PROCESSING`, `EXPIRED`, `COMPLETED`, `FAILED`. |
 | `content[].input.failureMessage` | `string \| null` | Operation failure details. |
 | `content[].input.expirationDate` | `string \| null` | Operation expiration timestamp. |
 | `content[].input.provider` | `string \| null` | Fiat-provider specific field (`FIAT_PROVIDER`). |
@@ -598,8 +621,8 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 | `content[].output.asset` | `string` | Output asset code. |
 | `content[].output.amount` | `number` | Output amount. |
 | `content[].output.transactionAmount` | `number \| null` | Provider/blockchain transaction amount. |
-| `content[].output.feeAmount` | `number \| null` | Output-side operation fee amount. |
-| `content[].output.status` | `string \| null` | Operation status. |
+| `content[].output.feeAmount` | `number \| null` | Output-side operation fee amount in `content[].output.asset` currency. |
+| `content[].output.status` | `string \| null` | Operation status. Allowed values: `NEW`, `PROCESSING`, `EXPIRED`, `COMPLETED`, `FAILED`. |
 | `content[].output.failureMessage` | `string \| null` | Operation failure details. |
 | `content[].output.expirationDate` | `string \| null` | Operation expiration timestamp. |
 | `content[].output.provider` | `string \| null` | Fiat-provider specific field (`FIAT_PROVIDER`). |
@@ -619,7 +642,7 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 | `content[].output.hash` | `string \| null` | Blockchain transaction hash. |
 | `content[].clientId` | `string` | Internal client id. |
 | `content[].sessionId` | `string \| null` | Related session id. |
-| `content[].status` | `string` | Order status value. |
+| `content[].status` | `string` | Order status value. Allowed values: `PROCESSING`, `EXPIRED`, `COMPLETED`, `FAILED`. |
 | `content[].failureMessage` | `string \| null` | Failure details, if any. |
 | `content[].completionDate` | `string \| null` | Completion timestamp. |
 | `content[].creationDate` | `string` | Creation timestamp. |
@@ -745,7 +768,7 @@ Use the response to select provider and render allowed direction/currency combin
 | `clientId` | `string` | No | Merchant client id. |
 | `fiatAsset` | `string` | No | Fiat asset filter. |
 | `orderType` | `string` | No | Direction filter (`BUY`/`SELL`). |
-| `destination` | `string` | No | Merchant destination filter. |
+| `destination` | `string` | No | Optional destination filter. Recommended value: `EXCHANGE`. |
 | `providers` | `array of string` | No | Explicit provider filter list. |
 | `isCrypto` | `boolean` | No | Crypto-method filter. |
 | `countryGroup` | `array of string` | No | Country-group filter. |
@@ -769,9 +792,9 @@ Use the response to select provider and render allowed direction/currency combin
 | `config.paymentSystems[].directions[].currencies[].countries` | `array of string` | Optional country restrictions. |
 | `commissions` | `array of objects` | Commission settings. |
 | `commissions[].bank` | `string \| null` | Optional bank scope for commission rule. |
-| `commissions[].destination` | `string \| null` | Optional destination scope for commission rule. |
-| `commissions[].buyCommission` | `string` | Buy-side commission value/range. |
-| `commissions[].sellCommission` | `string` | Sell-side commission value/range. |
+| `commissions[].destination` | `string \| null` | Optional destination scope for commission rule. Recommended value for SDK flow: `EXCHANGE`. |
+| `commissions[].buyCommission` | `string` | Buy-side commission percentage (or percentage range) in string format defined by provider config. |
+| `commissions[].sellCommission` | `string` | Sell-side commission percentage (or percentage range) in string format defined by provider config. |
 
 ### Errors
 
@@ -805,7 +828,7 @@ Example:
 | Name | Type | Description |
 | --- | --- | --- |
 | `id` | `string` | Webhook event id. |
-| `type` | `string` | Event type (`order.processing`, `order.completed`, `order.error`, `order.expired`, `order.failed`). |
+| `type` | `string` | Event type (`order.processing`, `order.completed`, `order.expired`, `order.failed`). |
 | `createdAt` | `string` | Event creation timestamp. |
 | `sessionId` | `string` | Session id related to the order event. |
 | `orderId` | `string` | Order id related to the event. |
@@ -813,28 +836,7 @@ Example:
 
 ## 5) Quote/Rate Notes
 
-How these values are calculated:
-- `plainRate` = base market rate (bid/ask) before final quote adjustments.
-- `rate` (final client rate):
-  - for SELL: `rate = toAmount / fromGrossAmount`
-  - for BUY: `rate = fromGrossAmount / toAmount`
-- percentage fee for any step: `fee = amount * percent / 100`
-- reverse fee (when target amount is fixed): `fee = amount / (1 - percent) - amount`
-- total fee by side:
-  - `fromFeeAmount = fromPaymentFeeAmount + fromExchangeFeeAmount`
-  - `toFeeAmount = toPaymentFeeAmount + toExchangeFeeAmount`
-  - if input is FIAT: `fee.total = fromFeeAmount`
-  - if input is CRYPTO: `fee.total = toFeeAmount`
-- network fee in response:
-  - if input is CRYPTO: `fee.network = fromPaymentFeeAmount`
-  - if input is FIAT: `fee.network = toPaymentFeeAmount`
-- `fee.service = null` (service part is not returned separately in this response format).
-
-Variables:
-- `fromGrossAmount`: how much the client gives before deductions.
-- `fromAmount`: amount left from input side after input-side fees.
-- `toAmount`: final amount the client receives after output-side fees.
-- `amount`: current amount used in fee formula on current step.
-- `percent`: fee percent configured for rule (e.g. `2.5` means `2.5%`).
-- `fromPaymentFeeAmount` / `toPaymentFeeAmount`: payment/transfer fee part.
-- `fromExchangeFeeAmount` / `toExchangeFeeAmount`: exchange service fee part.
+Use these fields in UI:
+- Show `actualRate` (or `actualRateValue`) to the client as the final client-facing rate.
+- Treat `exchangeRate` / `exchangeRateValue` as engine/reference rate used in calculation.
+- Fee values are returned with explicit asset fields; always interpret fee amount in its corresponding asset currency.
