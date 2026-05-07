@@ -206,8 +206,6 @@ Use the response to validate amount input before creating session/order.
 | --- | --- | --- |
 | `asset` | `object` | Asset for which limit values are returned. |
 | `asset.code` | `string` | Asset code. |
-| `asset.network` | `string \| null` | Asset network, if present. |
-| `asset.protocol` | `string \| null` | Asset protocol, if present. |
 | `min` | `number` | Minimum allowed amount. |
 | `max` | `number` | Maximum allowed amount. |
 
