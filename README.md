@@ -7,13 +7,13 @@ It prepares pre-calculated exchange context (rates, fees, limits), returns `sess
 
 ## Supported Assets
 
-### Fiat
+**Fiat**
 - `BYN`
 - `RUB`
 - `USD`
 - `EUR`
 
-### Crypto
+**Crypto**
 - `BTC`
 - `ETH`
 - `TRX`
@@ -31,20 +31,20 @@ It prepares pre-calculated exchange context (rates, fees, limits), returns `sess
 
 ## Supported Payment Providers
 
-### Belarus
+**Belarus**
 - `ALFA` (`BYN`, `RUB`, `USD`, `EUR`)
 - `ASSIST` (`BYN`, `RUB`, `USD`, `EUR`)
 - `STATUSBANK` (`BYN`, `RUB`, `USD`, `EUR`)
 - `CA` (`BYN`, `RUB`, `USD`, `EUR`)
 
-### Russia
+**Russia**
 - `SBER` (`RUB`)
 - `CARUSELL` (`RUB`)
 - `MTS` (`RUB`)
 - `VTB` (`RUB`)
 - `CA` (`BYN`, `RUB`, `USD`, `EUR`)
 
-### Tajikistan
+**Tajikistan**
 - `CORTI_MILLI` (`RUB`)
 
 ## 1) Session Endpoints
