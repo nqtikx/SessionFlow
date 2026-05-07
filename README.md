@@ -108,7 +108,7 @@ Use the response `sessionId` and `sdk.url` to start the client flow and track it
 }
 ```
 
-### Headers
+**Headers**
 
 <table width="100%">
   <thead>
@@ -129,7 +129,7 @@ Use the response `sessionId` and `sdk.url` to start the client flow and track it
   </tbody>
 </table>
 
-### Request
+**Request**
 
 <table width="100%">
   <thead>
@@ -204,7 +204,7 @@ Use the response `sessionId` and `sdk.url` to start the client flow and track it
   </tbody>
 </table>
 
-### Response
+**Response**
 
 <table width="100%">
   <thead>
@@ -328,7 +328,7 @@ Use the response `sessionId` and `sdk.url` to start the client flow and track it
   </tbody>
 </table>
 
-### Errors
+**Errors**
 
 <table width="100%">
   <thead>
@@ -393,7 +393,7 @@ Use the response to validate amount input before creating session/order.
 }
 ```
 
-### Headers
+**Headers**
 
 <table width="100%">
   <thead>
@@ -414,7 +414,7 @@ Use the response to validate amount input before creating session/order.
   </tbody>
 </table>
 
-### Request
+**Request**
 
 <table width="100%">
   <thead>
@@ -447,7 +447,7 @@ Use the response to validate amount input before creating session/order.
   </tbody>
 </table>
 
-### Response
+**Response**
 
 <table width="100%">
   <thead>
@@ -481,7 +481,7 @@ Use the response to validate amount input before creating session/order.
   </tbody>
 </table>
 
-### Errors
+**Errors**
 
 <table width="100%">
   <thead>
@@ -580,7 +580,7 @@ Use the response to restore session/order state in SDK integration.
 }
 ```
 
-### Headers
+**Headers**
 
 <table width="100%">
   <thead>
@@ -601,7 +601,7 @@ Use the response to restore session/order state in SDK integration.
   </tbody>
 </table>
 
-### Params
+**Params**
 
 <table width="100%">
   <thead>
@@ -634,7 +634,7 @@ Use the response to restore session/order state in SDK integration.
   </tbody>
 </table>
 
-### Response
+**Response**
 
 <table width="100%">
   <thead>
@@ -1003,7 +1003,7 @@ Use the response to restore session/order state in SDK integration.
   </tbody>
 </table>
 
-### Errors
+**Errors**
 
 <table width="100%">
   <thead>
@@ -1156,7 +1156,7 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 }
 ```
 
-### Headers
+**Headers**
 
 <table width="100%">
   <thead>
@@ -1177,7 +1177,7 @@ Use the response to build order history UI, analytics, and reconciliation flows.
   </tbody>
 </table>
 
-### Request
+**Request**
 
 <table width="100%">
   <thead>
@@ -1444,7 +1444,7 @@ Use the response to build order history UI, analytics, and reconciliation flows.
   </tbody>
 </table>
 
-### Response
+**Response**
 
 <table width="100%">
   <thead>
@@ -1928,7 +1928,7 @@ Use the response to build order history UI, analytics, and reconciliation flows.
   </tbody>
 </table>
 
-### Errors
+**Errors**
 
 <table width="100%">
   <thead>
@@ -2031,7 +2031,7 @@ Use the response to select provider and render allowed direction/currency combin
 ]
 ```
 
-### Headers
+**Headers**
 
 <table width="100%">
   <thead>
@@ -2052,7 +2052,7 @@ Use the response to select provider and render allowed direction/currency combin
   </tbody>
 </table>
 
-### Request
+**Request**
 
 <table width="100%">
   <thead>
@@ -2109,7 +2109,7 @@ Use the response to select provider and render allowed direction/currency combin
   </tbody>
 </table>
 
-### Response
+**Response**
 
 <table width="100%">
   <thead>
@@ -2213,7 +2213,7 @@ Use the response to select provider and render allowed direction/currency combin
   </tbody>
 </table>
 
-### Errors
+**Errors**
 
 <table width="100%">
   <thead>
@@ -2257,7 +2257,7 @@ Example:
 }
 ```
 
-### Response
+**Response**
 
 <table width="100%">
   <thead>
