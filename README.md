@@ -5,6 +5,14 @@ It prepares pre-calculated exchange context (rates, fees, limits), returns `sess
 
 > BASE_URL https://api.dev.wbdevel.net
 
+## Navigation
+
+- [Step 1. Create session](#step-1-create-session)
+- [Step 2. Get buy limit by fiat asset and provider](#step-2-get-buy-limit-by-fiat-asset-and-provider)
+- [Step 3. Get current order by client reference](#step-3-get-current-order-by-client-reference)
+- [Step 4. Get order history with filters](#step-4-get-order-history-with-filters)
+- [Step 5. Get available payment providers](#step-5-get-available-payment-providers)
+
 ## Supported Assets
 
 ### Fiat
