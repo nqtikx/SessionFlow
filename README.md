@@ -66,31 +66,39 @@ Use the response `sessionId` and `sdk.url` to start the client flow and track it
 **Response**
 ```json
 {
-  "sessionId": "14500600-0631-46c4-9ae1-fab9e4c798f8",
-  "externalClientId": "external-client-id-2",
-  "destinationCryptoAddress": "TCT2pKJXo233hrKWQMeCptC8My1KGvtsU4",
-  "comment": null,
-  "exchange": {
-    "fromAsset": "USD",
-    "fromGrossAmount": 20,
-    "fromNetAmount": 19.5,
-    "toAsset": "TRX",
-    "toGrossAmount": 68.783069,
-    "toNetAmount": 68.520069,
-    "actualRate": 0.2919,
-    "exchangeRate": 0.2835,
-    "fees": [
-      { "type": "PERCENT", "amount": -0.5, "asset": "USD" },
-      { "type": "CRYPTO_FEE", "amount": -0.263, "asset": "TRX" }
-    ]
-  },
-  "limit": {
-    "min": 11.67,
-    "max": 13333.33
-  },
-  "sdk": {
-    "url": "https://sdk.dev.wbdevel.net/v2.0/?mode=LoginMode&merchantId=...&externalClientId=...&sessionId=..."
-  }
+    "sessionId": "6fe3c52c-329d-419f-ab95-9c8a24546301",
+    "externalClientId": "externalClientId",
+    "destinationCryptoAddress": "TCT2pKJXo233hrKWQMeCptC8My1KGvtsU4",
+    "comment": null,
+    "exchange": {
+        "fromAsset": "USD",
+        "fromGrossAmount": "20",
+        "fromNetAmount": "19.5",
+        "toAsset": "TRX",
+        "toGrossAmount": "56.472632",
+        "toNetAmount": "56.209632",
+        "actualRate": "0.3558",
+        "exchangeRate": "0.3453",
+        "fees": [
+            {
+                "type": "PERCENT",
+                "amount": "-0.5",
+                "asset": "USD"
+            },
+            {
+                "type": "CRYPTO_FEE",
+                "amount": "-0.263",
+                "asset": "TRX"
+            }
+        ]
+    },
+    "limit": {
+        "min": "5",
+        "max": "10000"
+    },
+    "sdk": {
+        "url": "https://sdk.dev.wbdevel.net/v2.0/?mode=LoginMode&merchantId=...&externalClientId=...&sessionId=...&currencyFrom=USD&currencyTo=TRX&disableCurrencyFrom=false&disableCurrencyTo=false&showBackButtonOnHomePage=false&currencyAmount=20&cryptoWallet=..."
+    }
 }
 ```
 
