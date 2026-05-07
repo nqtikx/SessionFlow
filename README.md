@@ -501,7 +501,6 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 | `externalClientId` | `string` | No | External client id filter. |
 | `sessionIds` | `array of string` | No | Filter by session ids (`UUID`). |
 | `clientIds` | `array of string` | Conditionally | Required when `externalClientId` is not provided (first value is used for merchant access validation). |
-| `clientId` | `string` | No | Deprecated single-value client filter field from DTO. |
 | `statuses` | `array of string` | No | Order status filter list. |
 | `creationDateFrame` | `object` | No | Creation date range filter object. |
 | `numbers` | `array of number` | No | Filter by order numbers. |
@@ -780,7 +779,6 @@ Use the response to select provider and render allowed direction/currency combin
 Possible session-related order events:
 - `order.processing`
 - `order.completed`
-- `order.error` (deprecated)
 - `order.expired`
 - `order.failed`
 
