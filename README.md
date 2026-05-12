@@ -61,9 +61,9 @@ Use the response `sessionId` and `sdk.url` to start the client flow and track it
 **Request**
 ```json
 {
-  "fromAsset": "BYN",
-  "fromAmount": 100,
-  "toAsset": "USDT_TRC",
+  "fromAsset": USD",
+  "fromAmount": 20,
+  "toAsset": "TRX",
   "destinationCryptoAddress": "TCT2pKJXo233hrKWQMeCptC8My1KGvtsU4",
   "externalClientId": "externalClientId"
 }
