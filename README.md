@@ -375,6 +375,7 @@ Use the response to validate amount input before creating session/order.
 
 **Headers**
 `x-api-key: {{x-api-key}}`
+`externalClientId: {{externalClientId}}`
 
 **Request**
 ```json
@@ -411,6 +412,12 @@ Use the response to validate amount input before creating session/order.
       <td>Yes</td>
       <td>Authenticates the merchant server-to-server request. Use the API key issued for the merchant and target environment.</td>
     </tr>
+    <tr>
+      <td style="word-break: break-word; white-space: normal;">externalClientId</td>
+      <td>string</td>
+      <td>No</td>
+      <td>Merchant-side external client identifier.</td>
+    </tr>
   </tbody>
 </table>
 
@@ -437,12 +444,6 @@ Use the response to validate amount input before creating session/order.
       <td>string</td>
       <td>Yes</td>
       <td>Payment provider code.</td>
-    </tr>
-    <tr>
-      <td style="word-break: break-word; white-space: normal;">clientId</td>
-      <td>string</td>
-      <td>No</td>
-      <td>Merchant client id, if limit is client-context dependent.</td>
     </tr>
   </tbody>
 </table>
@@ -517,7 +518,7 @@ Use the response to restore session/order state in SDK integration.
 `x-api-key: {{x-api-key}}`
 
 **Parameters**
-`clientId: {{clientId}}`
+`externalClientId: {{externalClientId}}`
 
 **Response**
 ```json
@@ -614,16 +615,10 @@ Use the response to restore session/order state in SDK integration.
   </thead>
   <tbody>
     <tr>
-      <td style="word-break: break-word; white-space: normal;">clientId</td>
-      <td>string</td>
-      <td>Conditionally</td>
-      <td>Required when externalClientId query param is not provided.</td>
-    </tr>
-    <tr>
       <td style="word-break: break-word; white-space: normal;">externalClientId</td>
       <td>string</td>
       <td>Conditionally</td>
-      <td>Required when clientId query param is not provided.</td>
+      <td>Merchant-side external client identifier used to resolve current order.</td>
     </tr>
     <tr>
       <td style="word-break: break-word; white-space: normal;">destination</td>
@@ -733,7 +728,7 @@ Use the response to restore session/order state in SDK integration.
     <tr>
       <td style="word-break: break-word; white-space: normal;">clientId</td>
       <td>string</td>
-      <td>Internal client id.</td>
+      <td>Internal Whitebird client id returned in the order response.</td>
     </tr>
     <tr>
       <td style="word-break: break-word; white-space: normal;">sessionId</td>
@@ -1039,9 +1034,7 @@ Use the response to build order history UI, analytics, and reconciliation flows.
 **Request**
 ```json
 {
-    "clientIds": [
-        "{{clientId}}"
-    ],
+    "externalClientId": "{{externalClientId}}",
     "operationTypes": [
         "FIAT_PROVIDER",
         "CRYPTO_TRANSFER"
@@ -1054,7 +1047,7 @@ Use the response to build order history UI, analytics, and reconciliation flows.
     "assets": [
         "BYN",
         "RUB",
-        "USD",
+        "USD"
     ],
     "destinations": [
         "EXCHANGE"
@@ -1192,20 +1185,14 @@ Use the response to build order history UI, analytics, and reconciliation flows.
     <tr>
       <td style="word-break: break-word; white-space: normal;">externalClientId</td>
       <td>string</td>
-      <td>No</td>
-      <td>External client id filter.</td>
+      <td>Conditionally</td>
+      <td>Merchant-side external client identifier used to resolve history for a specific client.</td>
     </tr>
     <tr>
       <td style="word-break: break-word; white-space: normal;">sessionIds</td>
       <td>array of string</td>
       <td>No</td>
       <td>Filter by session ids (UUID).</td>
-    </tr>
-    <tr>
-      <td style="word-break: break-word; white-space: normal;">clientIds</td>
-      <td>array of string</td>
-      <td>Conditionally</td>
-      <td>Required when externalClientId is not provided (first value is used for merchant access validation).</td>
     </tr>
     <tr>
       <td style="word-break: break-word; white-space: normal;">statuses</td>
@@ -1962,13 +1949,7 @@ Use the response to select provider and render allowed direction/currency combin
 
 **Headers**
 `x-api-key: {{x-api-key}}`
-
-**Request**
-```json
-{
-    "clientId": "{{clientId}}"
-}
-```
+`externalClientId: {{externalClientId}}`
 
 **Response**
 ```json
@@ -2049,6 +2030,12 @@ Use the response to select provider and render allowed direction/currency combin
       <td>Yes</td>
       <td>Authenticates the merchant server-to-server request. Use the API key issued for the merchant and target environment.</td>
     </tr>
+    <tr>
+      <td style="word-break: break-word; white-space: normal;">externalClientId</td>
+      <td>string</td>
+      <td>No</td>
+      <td>Merchant-side external client identifier.</td>
+    </tr>
   </tbody>
 </table>
 
@@ -2064,12 +2051,6 @@ Use the response to select provider and render allowed direction/currency combin
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <td style="word-break: break-word; white-space: normal;">clientId</td>
-      <td>string</td>
-      <td>No</td>
-      <td>Merchant client id.</td>
-    </tr>
     <tr>
       <td style="word-break: break-word; white-space: normal;">fiatAsset</td>
       <td>string</td>
