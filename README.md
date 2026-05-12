@@ -375,7 +375,6 @@ Use the response to validate amount input before creating session/order.
 
 **Headers**
 `x-api-key: {{x-api-key}}`
-`externalClientId: {{externalClientId}}`
 
 **Request**
 ```json
@@ -411,12 +410,6 @@ Use the response to validate amount input before creating session/order.
       <td>string</td>
       <td>Yes</td>
       <td>Authenticates the merchant server-to-server request. Use the API key issued for the merchant and target environment.</td>
-    </tr>
-    <tr>
-      <td style="word-break: break-word; white-space: normal;">externalClientId</td>
-      <td>string</td>
-      <td>No</td>
-      <td>Merchant-side external client identifier.</td>
     </tr>
   </tbody>
 </table>
